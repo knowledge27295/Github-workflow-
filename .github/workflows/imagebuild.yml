@@ -2,8 +2,8 @@ name: "CICD for Nginx using Dockerfile"
 on:
   push:
     branches: ["main"]
-    # paths-ignore:
-    #   - "src/**"
+    #path-ignore:
+    #  - "src/**"
   pull_request:
     branches: ["main"]
 
@@ -16,22 +16,21 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USER_NAME }}
-          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-
+          password: ${{ secrets.DOCKER__ACCESS__TOKEN }}
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build and push image to Docker Hub
+      - name: Build image push to Docker Hub
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USER_NAME }}/saikumar27295/dev:siva
+          tags: ${{ secrets.DOCKER_USER_NAME }}/saikumar27295/devops:saikumar
