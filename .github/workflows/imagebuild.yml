@@ -1,39 +1,33 @@
-name: "CICD for Nginx using Dockerfile"
+name: Build and Push Docker Image
+
 on:
   push:
-    branches: ["main"]
-    #path-ignore:
-    #  - "src/**"
+    branches:
+      - main
   pull_request:
-    branches: ["main"]
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 jobs:
-  nginx-image-build:
+  build:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITUSER }}
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USER_NAME }}
-          password: ${{ secrets.DOCKER__ACCESS__TOKEN }}
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER__ACCESS__TOKEN }}" | docker login -u "${{ secrets.DOCKER_USER_NAME }}" --password-stdin
 
-      - name: Build image push to Docker Hub
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-          tags: ${{ secrets.DOCKER_USER_NAME }}/saikumar27295/prod:vaishu
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_USER_NAME }}/saikumar27295:uat
+
+    - name: Log out from Docker Hub
+      run: docker logout
